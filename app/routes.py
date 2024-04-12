@@ -4,6 +4,21 @@ from app.forms import RegistrationForm, LoginForm
 from app import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 
+posts = [
+    {
+        'author': 'Corey Schafer',
+        'title': 'Blog Post 1',
+        'content': 'First post content',
+        'date_posted': 'April 20, 2018'
+    },
+    {
+        'author': 'Jane Doe',
+        'title': 'Blog Post 2',
+        'content': 'Second post content',
+        'date_posted': 'April 21, 2018'
+    }
+]
+
 
 @app.route("/")
 @app.route("/home")
