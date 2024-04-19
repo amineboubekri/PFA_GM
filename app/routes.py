@@ -6,16 +6,16 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 posts = [
     {
-        'author': 'Amine ',
-        'title': 'Premier achat',
-        'content': 'First post content',
-        'date_posted': 'April 20, 2055'
+        'author': 'Amine',
+        'title': 'Premiere transaction',
+        'content': '',
+        'date_posted': 'April 20, 2024'
     },
     {
         'author': 'Mohamed',
-        'title': 'Deuxieme achat',
-        'content': 'Second post content',
-        'date_posted': 'April 21, 2055'
+        'title': 'Premiere transaction',
+        'content': '',
+        'date_posted': 'April 21, 2024'
     }
 ]
 
@@ -23,12 +23,12 @@ posts = [
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html', posts=posts)
+    return render_template('home.html',nav="yes", posts=posts)
 
 
 @app.route("/about")
 def about():
-    return render_template('about.html', title='About')
+    return render_template('about.html',nav="yes", title='About')
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -43,7 +43,7 @@ def register():
         db.session.commit()
         flash(f'Your account has been created! You can Log In now', 'success')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register2.html', title='Register', form=form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -59,7 +59,7 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+    return render_template('login2.html', title='Login',nav='no', form=form)
 
 @app.route("/logout")
 def logout():
@@ -70,4 +70,10 @@ def logout():
 @login_required
 def account():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html', title='Account', image_file=image_file)
+    return render_template('account.html',nav="yes", title='Account', image_file=image_file)
+
+
+# @app.route("/login1",methods=['GET', 'POST'])
+# def login2():
+#     form ="hi"
+#     return render_template('login.html', title='css bs',nav='no'form=form)
