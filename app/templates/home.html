@@ -2,7 +2,7 @@
     {% block content %}
     <br>
         <h1 align="center" style="color: goldenrod;">Home Page</h1>
-        {% for post in posts %}
+        {% for post in posts.items %}
         <br>
             <article class="media content-section">
                 <img class="rounded-circle article-image" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}" alt="">
@@ -15,5 +15,12 @@
                 <p class="article-content">{{ post.content }}</p>
                 </div>
             </article>
+        {% endfor %}
+        {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                <a class="btn btn-outline-info mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                ....
+            {% endif %}
         {% endfor %}
     {% endblock content%}
