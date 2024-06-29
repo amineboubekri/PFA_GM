@@ -71,10 +71,87 @@
           </div>
         </div>
       </section>
+      <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
+        <div class="media-body">
+          <h2 class="article-title">Compte</h2>
+          <div class="account-details">
+            <h3>Total des transactions: {{ current_user.balance }} MAD</h3>
+            <h4>Historique</h4>
+            <table class="table table-hover">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Title</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in transactions %}
+                  <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ transaction.title }}</td>
+                    <td>{{ transaction.montant }} MAD</td>
+                    <td>{{ transaction.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ transaction.description }}</td>
+                    <td>{{ transaction.categorie.nom }}</td>
+                    <td>
+                      <a href="{{ url_for('update_transaction', transaction_id=transaction.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                      <form method="POST" action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}" onsubmit="return deleteTransaction(event, {{ transaction.id }}, {{ transaction.montant }});">
+                          {{ form.hidden_tag() }}
+                          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                      </form>
+                  </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
       
       <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
       <script src="{{ url_for('static', filename='js/popper.js') }}"></script>
       <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
       <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     </div>
+    <script>
+      function deleteTransaction(event, transactionId, transactionAmount) {
+          event.preventDefault();
+          
+          const form = event.target;
+          
+          const formData = new FormData(form);
+          
+          fetch(form.action, {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => {
+              if (response.ok) {
+                  document.getElementById('transaction-' + transactionId).remove();
+                  
+                  const balanceElement = document.getElementById('balance');
+                  const newBalance = parseFloat(balanceElement.textContent) - transactionAmount;
+                  balanceElement.textContent = newBalance.toFixed(2);
+                  
+                  alert('Transaction deleted successfully.');
+              } else {
+                  alert('Failed to delete the transaction.');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              window.location.reload();
+          });
+          
+          return false;
+      }
+      </script>
+      
+      
 {% endblock content %}

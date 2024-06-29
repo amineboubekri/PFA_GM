@@ -1,6 +1,6 @@
 from app import db, login_manager
 from datetime import datetime
-from  flask_login import UserMixin
+from flask_login import UserMixin
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -12,10 +12,13 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
+    balance = db.Column(db.Float, nullable=False, default=0.0)
     posts = db.relationship('Post', backref='author', lazy=True)
+    transactions = db.relationship('Transaction', backref='owner', lazy=True)
 
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+        return f"User('{self.username}', '{self.email}', '{self.image_file}', '{self.balance}')"
+
 
 
 class Post(db.Model):
@@ -29,16 +32,14 @@ class Post(db.Model):
         return f"Post('{self.title}', '{self.date_posted}')"
     
 class Transaction(db.Model):
-    id_t = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) 
     title = db.Column(db.String(100), nullable=False)
-    montant = db.Column(db.Float, primary_key=True)
+    montant = db.Column(db.Float, nullable=False)  
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     description = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     cat_id = db.Column(db.Integer, db.ForeignKey('categorie.id_cat'), nullable=False)
-    categorie = db.relationship('Categorie', backref='categorie', lazy=True)
-
-
+    categorie = db.relationship('Categorie', backref='transactions', lazy=True)  
 
     def __repr__(self):
         return f"Transaction('{self.title}', '{self.montant}', '{self.date}')"
@@ -48,4 +49,4 @@ class Categorie(db.Model):
     nom = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
-        return f"Categorie('{self.title}', '{self.nom}')"
+        return f"Categorie('{self.nom}')"

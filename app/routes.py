@@ -1,9 +1,9 @@
 import os
 import secrets
 from PIL import Image 
-from app.models import User, Post
+from app.models import User, Post, Transaction, Categorie
 from flask import render_template, url_for, flash, redirect, request, abort
-from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, TransactionForm, CategoryForm, UpdateBalanceForm
 from app import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -70,24 +70,29 @@ def save_picture(form_picture):
     return picture_fn
 
 
-@app.route("/account", methods=['GET', 'POST'])
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
-    if form.validate_on_submit():
+
+    if form.validate_on_submit() and form.submit.data:
         if form.picture.data:
-            picture_file = save_picture(form.picture.data) 
+            picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
-        flash('Your account has been updated','success')
+        flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
+
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
+
+    transactions = Transaction.query.filter_by(user_id=current_user.id).all()
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html',nav="yes", title='Account', image_file=image_file, form=form)
+    return render_template('account.html', title='Account', image_file=image_file, form=form, transactions=transactions, balance=current_user.balance, nav="yes")
+
 
 
 @app.route("/post/new", methods=['GET', 'POST'])
@@ -147,6 +152,84 @@ def user_posts(username):
         .order_by(Post.date_posted.desc())\
         .paginate(page=page,per_page=5)
     return render_template('user_posts.html',nav="yes", posts=posts, user=user)
+
+@app.route("/transaction/new", methods=['GET', 'POST'])
+@login_required
+def new_transaction():
+    form = TransactionForm()
+    if form.validate_on_submit():
+        transaction = Transaction(
+            title=form.title.data,
+            montant=form.montant.data,
+            date=form.date.data,
+            description=form.description.data,
+            user_id=current_user.id,
+            cat_id=form.categorie.data
+        )
+        db.session.add(transaction)
+        
+        current_user.balance += transaction.montant 
+        db.session.commit()
+        
+        flash('Your transaction has been added!', 'success')
+        return redirect(url_for('account'))
+    return render_template('transaction.html', title='New Transaction', form=form, nav="yes")
+
+@app.route("/categories", methods=['GET', 'POST'])
+@login_required
+def categories():
+    form = CategoryForm()
+    if form.validate_on_submit():
+        category = Categorie(nom=form.name.data)
+        db.session.add(category)
+        db.session.commit()
+        flash('New category has been created!', 'success')
+        return redirect(url_for('categories'))
+    categories = Categorie.query.all()
+    return render_template('categories.html', title='Categories', form=form, categories=categories, nav="yes")
+
+@app.route("/transaction/<int:transaction_id>/delete", methods=['POST'])
+@login_required
+def delete_transaction(transaction_id):
+    transaction = Transaction.query.get_or_404(transaction_id)
+    if transaction.owner != current_user:
+        abort(403)
+    current_user.balance -= transaction.montant
+    db.session.delete(transaction)
+    db.session.commit()
+    flash('Your transaction has been deleted!', 'success')
+    return redirect(url_for('account'))
+
+@app.route("/transaction/<int:transaction_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_transaction(transaction_id):
+    transaction = Transaction.query.get_or_404(transaction_id)
+    if transaction.owner != current_user:
+        abort(403)
+    
+    form = TransactionForm()
+    
+    if form.validate_on_submit():
+        transaction.title = form.title.data
+        transaction.montant = form.montant.data
+        transaction.date = form.date.data
+        transaction.description = form.description.data
+        transaction.cat_id = form.categorie.data
+        db.session.commit()
+        flash('Your transaction has been updated!', 'success')
+        return redirect(url_for('account'))
+    
+    elif request.method == 'GET':
+        form.id.data = transaction.id
+        form.title.data = transaction.title
+        form.montant.data = transaction.montant
+        form.date.data = transaction.date
+        form.description.data = transaction.description
+        form.categorie.data = transaction.cat_id
+    
+    return render_template('transaction.html', title='Update Transaction', form=form, nav="yes")
+
+
 
 # @app.route("/login1",methods=['GET', 'POST'])
 # def login2():
