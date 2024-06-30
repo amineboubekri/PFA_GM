@@ -1,36 +1,44 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <article class="media content-section">
-    <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
-    <div class="media-body">
-      <h2 class="article-title">{{ 'Update Transaction' if form.id.data else 'Add Transaction' }}</h2>
-      <form method="POST" action="{{ url_for('update_transaction', transaction_id=form.id.data) if form.id.data else url_for('new_transaction') }}">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-          {{ form.title.label(class="form-control-label") }}
-          {{ form.title(class="form-control form-control-lg") }}
-        </div>
-        <div class="form-group">
-          {{ form.montant.label(class="form-control-label") }}
-          {{ form.montant(class="form-control form-control-lg") }}
-        </div>
-        <div class="form-group">
-          {{ form.date.label(class="form-control-label") }}
-          {{ form.date(class="form-control form-control-lg") }}
-        </div>
-        <div class="form-group">
-          {{ form.description.label(class="form-control-label") }}
-          {{ form.description(class="form-control form-control-lg") }}
-        </div>
-        <div class="form-group">
-          {{ form.categorie.label(class="form-control-label") }}
-          {{ form.categorie(class="form-control form-control-lg") }}
-        </div>
-        <div class="form-group">
-          {{ form.submit(class="btn btn-primary btn-lg") }}
-        </div>
-      </form>
-    </div>
-  </article>
+<br>
+<article class="media content-section">
+  <img class="rounded-circle article-img"
+    src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
+  <div class="media-body">
+    <h2 class="article-title">{{ 'Update Transaction' if form.id.data else 'Add Transaction' }}</h2>
+    <form method="POST"
+      action="{{ url_for('update_transaction', transaction_id=form.id.data) if form.id.data else url_for('new_transaction') }}">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.title.label(class="form-control-label", style="color:black;") }}
+        {{ form.title(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important")
+        }}
+      </div>
+      <div class="form-group">
+        {{ form.montant.label(class="form-control-label", style="color:black;") }}
+        {{ form.montant(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
+        !important") }}
+      </div>
+      <div hidden class="form-group">
+        {{ form.date.label(class="form-control-label", style="color:black;") }}
+        {{ form.date(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important")
+        }}
+      </div>
+      <div class="form-group">
+        {{ form.description.label(class="form-control-label", style="color:black;") }}
+        {{ form.description(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
+        !important") }}
+      </div>
+      <div class="form-group">
+        {{ form.categorie.label(class="form-control-label", style="color:black;") }}
+        {{ form.categorie(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
+        !important") }}
+      </div>
+      <div class="form-group">
+        {{ form.submit(class="btn btn-primary btn-lg") }}
+      </div>
+    </form>
+  </div>
+</article>
 {% endblock %}
