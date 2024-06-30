@@ -25,7 +25,8 @@
   <article class="media">
     <div class="media-body">
       <div class="account-details">
-        <h3>&MediumSpace; Total des transactions: {{ current_user.balance }} MAD</h3>
+        <h3>&MediumSpace; Total des transactions : {{ current_user.total_transactions }} MAD</h3>
+        <h3>&MediumSpace; Balance: {{ current_user.balance }} MAD</h3>
         <h4>&MediumSpace; Historique de transactions</h4>
         
         <form method="GET" action="{{ url_for('account') }}" class="form-inline mb-3">

@@ -199,22 +199,25 @@ def user_posts(username):
 @login_required
 def new_transaction():
     form = TransactionForm()
+    form.categorie.choices = [(c.id_cat, c.nom) for c in Categorie.query.all()]
     if form.validate_on_submit():
-        transaction = Transaction(
-            title=form.title.data,
-            montant=form.montant.data,
-            date=form.date.data,
-            description=form.description.data,
-            user_id=current_user.id,
-            cat_id=form.categorie.data
-        )
-        db.session.add(transaction)
-        
-        current_user.balance += transaction.montant 
-        db.session.commit()
-        
-        flash('Your transaction has been added!', 'success')
-        return redirect(url_for('account'))
+        if float(form.montant.data) > current_user.balance:
+            flash('Insufficient balance for this transaction.', 'danger')
+        else:
+            transaction = Transaction(
+                title=form.title.data,
+                montant=form.montant.data,
+                date=form.date.data,
+                description=form.description.data,
+                user_id=current_user.id,
+                cat_id=form.categorie.data
+            )
+            db.session.add(transaction)
+            current_user.balance -= float(form.montant.data)
+            current_user.total_transactions += float(form.montant.data)
+            db.session.commit()
+            flash('Transaction successful.', 'success')
+            return redirect(url_for('account'))
     return render_template('transaction.html', title='New Transaction', form=form, nav="yes")
 
 @app.route("/categories", methods=['GET', 'POST'])
@@ -236,7 +239,7 @@ def delete_transaction(transaction_id):
     transaction = Transaction.query.get_or_404(transaction_id)
     if transaction.owner != current_user:
         abort(403)
-    current_user.balance -= transaction.montant
+    current_user.balance += transaction.montant
     db.session.delete(transaction)
     db.session.commit()
     flash('Your transaction has been deleted!', 'success')
@@ -271,6 +274,16 @@ def update_transaction(transaction_id):
     
     return render_template('transaction.html', title='Update Transaction', form=form, nav="yes")
 
+@app.route("/update_balance", methods=['GET', 'POST'])
+@login_required
+def update_balance():
+    form = UpdateBalanceForm()
+    if form.validate_on_submit():
+        current_user.balance += float(form.amount.data)
+        db.session.commit()
+        flash('Your balance has been updated.', 'success')
+        return redirect(url_for('account'))
+    return render_template('update_balance.html', title='Update Balance', form=form, nav="yes")
 
 
 # @app.route("/login1",methods=['GET', 'POST'])

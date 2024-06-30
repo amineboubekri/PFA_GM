@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed   
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, DateTimeField, SelectField, HiddenField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, DateTimeField, SelectField, HiddenField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
 from app.models  import User, Transaction, Categorie
 from flask_login import current_user
@@ -99,6 +99,6 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("This email is already taken, choose another one")
 
 class UpdateBalanceForm(FlaskForm):
-    balance = FloatField('Set New Balance', validators=[DataRequired()])
-    montant = FloatField('Add Amount', validators=[DataRequired()])
+    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0)], places=2)
     submit = SubmitField('Update Balance')
+
