@@ -1,5 +1,12 @@
 {% extends "layout.html" %}
     {% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash-message" style="color: #dddddd;">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     <br>
         <h1 align="center" style="color: goldenrod;">Home Page</h1>
         {% for post in posts.items %}

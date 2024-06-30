@@ -240,6 +240,7 @@ def delete_transaction(transaction_id):
     if transaction.owner != current_user:
         abort(403)
     current_user.balance += transaction.montant
+    current_user.total_transactions -= transaction.montant
     db.session.delete(transaction)
     db.session.commit()
     flash('Your transaction has been deleted!', 'success')
