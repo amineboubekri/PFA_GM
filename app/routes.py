@@ -1,10 +1,12 @@
 import os
 import secrets
+from datetime import datetime
 from PIL import Image 
 from app.models import User, Post, Transaction, Categorie
 from flask import render_template, url_for, flash, redirect, request, abort
 from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, TransactionForm, CategoryForm, UpdateBalanceForm
 from app import app, db, bcrypt
+from sqlalchemy import extract
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -89,11 +91,51 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
 
-    transactions = Transaction.query.filter_by(user_id=current_user.id).all()
+    now = datetime.now()
+    selected_year = request.args.get('year', now.year, type=int)
+    selected_month = request.args.get('month', now.month, type=int)
+
+    transactions = Transaction.query.filter(
+        Transaction.user_id == current_user.id,
+        extract('year', Transaction.date) == selected_year,
+        extract('month', Transaction.date) == selected_month
+    ).all()
+
+    # calculer spending per category
+    category_spending = db.session.query(
+        Categorie.nom, db.func.sum(Transaction.montant)
+    ).join(Transaction).filter(
+        Transaction.user_id == current_user.id,
+        extract('year', Transaction.date) == selected_year,
+        extract('month', Transaction.date) == selected_month
+    ).group_by(Categorie.nom).all()
+
+    # variables de chart
+    categories = [category for category, _ in category_spending]
+    amounts = [amount for _, amount in category_spending]
+
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html', title='Account', image_file=image_file, form=form, transactions=transactions, balance=current_user.balance, nav="yes")
+    return render_template('account.html', title='Account', image_file=image_file, form=form, transactions=transactions, balance=current_user.balance, nav="yes", selected_year=selected_year, selected_month=selected_month, now=now, categories=categories, amounts=amounts)
 
 
+@app.route("/account/update", methods=['GET', 'POST'])
+@login_required
+def update_account():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('update_account.html', title='Update Account', image_file=image_file, form=form, nav="yes")
 
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required

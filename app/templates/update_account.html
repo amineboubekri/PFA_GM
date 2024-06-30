@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <div class="media">
+        <img class="rounded-circle account-img" src="{{ image_file }}">
+        <div class="media-body">
+            <h2 class="account-heading">{{ current_user.username }}</h2>
+            <p class="text-secondary">{{ current_user.email }}</p>
+        </div>
+    </div>
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.username.label(class="form-control-label", style="color:black;") }}
+            {{ form.username(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
+            !important") }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label(class="form-control-label", style="color:black;") }}
+            {{ form.email(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
+            !important") }}
+        </div>
+        <div class="form-group">
+            {{ form.picture.label(class="form-control-label") }}
+            {{ form.picture(class="form-control-file") }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary btn-lg") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

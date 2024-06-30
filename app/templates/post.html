@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <article class="media content-section">
-  <img class="rounded-circle article-img"
-    src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+  <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
   <div class="media-body">
     <div class="article-metadata">
       <a class="mr-2" href="{{ url_for('user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
@@ -10,22 +9,16 @@
       {% if post.author == current_user %}
       <div>
         <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post', post_id=post.id) }}">Update</a>
-        <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal"
-          data-target="#deleteModal">Delete</button>
+        <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
       </div>
       {% endif %}
     </div>
-    <h2 class="article-title">{{ post.title(class="form-control form-control-lg",style="border-color:
-      rgba(0,0,0.4);color:black
-      !important") }}</h2>
-    <p class="article-content">{{ post.content(class="form-control form-control-lg",style="border-color:
-      rgba(0,0,0.4);color:black
-      !important") }}</p>
+    <h2 class="article-title" style="border-color: rgba(0,0,0,0.4); color: black !important;">{{ post.title }}</h2>
+    <p class="article-content" style="border-color: rgba(0,0,0,0.4); color: black !important;">{{ post.content }}</p>
   </div>
 </article>
 <!-- Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-  aria-hidden="true">
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">

@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<br>
 <article class="media content-section">
   <img class="rounded-circle article-img"
     src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
@@ -20,7 +19,7 @@
         {{ form.montant(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
         !important") }}
       </div>
-      <div hidden class="form-group">
+      <div class="form-group">
         {{ form.date.label(class="form-control-label", style="color:black;") }}
         {{ form.date(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important")
         }}
