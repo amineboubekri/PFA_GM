@@ -2,9 +2,9 @@ import os
 import secrets
 from datetime import datetime
 from PIL import Image 
-from app.models import User, Post, Transaction, Categorie
+from app.models import User, Post, Transaction, Categorie, Comment
 from flask import render_template, url_for, flash, redirect, request, abort
-from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, TransactionForm, CategoryForm, UpdateBalanceForm
+from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, TransactionForm, CategoryForm, UpdateBalanceForm, CommentForm, UpdateCommentForm
 from app import app, db, bcrypt
 from sqlalchemy import extract
 from flask_login import login_user, current_user, logout_user, login_required
@@ -150,10 +150,40 @@ def new_post():
     return render_template('create_post.html',nav="yes", title='New Post', form=form, legend="New Post")
 
 
-@app.route("/post/<int:post_id>")
+@app.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post, nav="yes")
+    form = CommentForm()
+    reply_form = CommentForm()
+
+    if form.validate_on_submit():
+        comment = Comment(content=form.content.data, author=current_user, post=post)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been posted.', 'success')
+        return redirect(url_for('post', post_id=post.id))
+
+    comments = Comment.query.filter_by(post_id=post.id, parent_id=None).all()
+    return render_template('post.html', title=post.title, post=post, form=form, comments=comments, reply_form=reply_form, nav="yes")
+
+@app.route("/comment/<int:comment_id>/reply", methods=['POST'])
+@login_required
+def reply_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    post = comment.post
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        reply = Comment(content=form.content.data, author=current_user, post=post, parent=comment)
+        db.session.add(reply)
+        db.session.commit()
+        flash('Your reply has been posted.', 'success')
+        return redirect(url_for('post', post_id=post.id))
+
+    comments = Comment.query.filter_by(post_id=post.id, parent_id=None).all()
+    reply_form = form  # Use the same form for replies
+    return render_template('post.html', title=post.title, post=post, form=CommentForm(), comments=comments, reply_form=reply_form, nav="yes")
+
 
 @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
 @login_required
@@ -286,7 +316,30 @@ def update_balance():
         return redirect(url_for('account'))
     return render_template('update_balance.html', title='Update Balance', form=form, nav="yes")
 
+@app.route("/comment/<int:comment_id>/update", methods=['POST'])
+@login_required
+def update_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    if comment.author != current_user:
+        abort(403)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment.content = form.content.data
+        db.session.commit()
+        flash('Your comment has been updated.', 'success')
+    return redirect(url_for('post', post_id=comment.post_id))
 
+@app.route('/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    post_id = comment.post_id
+    if comment.author != current_user:
+        abort(403)
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Your comment has been deleted!', 'success')
+    return redirect(url_for('post', post_id=post_id))
 # @app.route("/login1",methods=['GET', 'POST'])
 # def login2():
 #     form ="hi"

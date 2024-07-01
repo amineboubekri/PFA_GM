@@ -102,3 +102,13 @@ class UpdateBalanceForm(FlaskForm):
     amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0)], places=2)
     submit = SubmitField('Update Balance')
 
+class CommentForm(FlaskForm):
+    content = TextAreaField('Comment', validators=[DataRequired()])
+    submit = SubmitField('Post Comment')
+
+class UpdateCommentForm(FlaskForm):
+    content = StringField('Content', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
+class DeleteCommentForm(FlaskForm):
+    submit = SubmitField('Delete')

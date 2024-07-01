@@ -13,16 +13,109 @@
       </div>
       {% endif %}
     </div>
-    <h2 class="article-title" style="border-color: rgba(0,0,0,0.4); color: black !important;">{{ post.title }}</h2>
-    <p class="article-content" style="border-color: rgba(0,0,0,0.4); color: black !important;">{{ post.content }}</p>
+    <h2 class="article-title">{{ post.title }}</h2>
+    <p class="article-content">{{ post.content }}</p>
+    <div class="comments-section">
+      <h3>Comments</h3>
+      <form action="{{ url_for('post', post_id=post.id) }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.content.label(class="form-control-label") }}
+          {{ form.content(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important") }}
+        </div>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+      </form>
+    
+      <!-- Display Comments -->
+      {% for comment in comments %}
+      {% if comment.parent_id is none %}
+      <div class="media mb-3">
+        <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + comment.author.image_file) }}">
+        <div class="media-body">
+          <h5 class="post-username">{{ comment.author.username }} <small class="text-muted">{{ comment.date_posted.strftime('%Y-%m-%d') }}</small></h5>
+          <p>{{ comment.content }}</p>
+          {% if comment.author == current_user %}
+          <button type="button" class="btn btn-secondary btn-sm mt-1 mb-1" onclick="toggleEditForm({{ comment.id }})">Edit</button>
+          <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
+            <input type="submit" type="button" class="btn btn-danger btn-sm m-1" value="Delete">
+          </form>
+          <!-- Edit Form -->
+          <form id="edit-form-{{ comment.id }}" action="{{ url_for('update_comment', comment_id=comment.id) }}" method="POST" style="display:none;">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              {{ form.content.label(class="form-control-label") }}
+              {{ form.content(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important", value=comment.content) }}
+            </div>
+            <div class="form-group">
+              {{ form.submit(class="btn btn-primary btn-sm", value="Edit Comment") }}
+            </div>
+          </form>
+          {% endif %}
+          <!-- Reply Form -->
+          <form action="{{ url_for('reply_comment', comment_id=comment.id) }}" method="POST">
+            {{ reply_form.hidden_tag() }}
+            <div class="form-group">
+              {{ reply_form.content.label(class="form-control-label") }}
+              {{ reply_form.content(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important") }}
+            </div>
+            <div class="form-group">
+              {{ reply_form.submit(class="btn btn-primary btn-sm", value="Reply") }}
+            </div>
+          </form>
+          <!-- Display Replies -->
+          {% for reply in comment.replies %}
+          <div class="media mt-3">
+            <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + reply.author.image_file) }}">
+            <div class="media-body">
+              <h5 class="post-username">{{ reply.author.username }} <small class="text-muted">{{ reply.date_posted.strftime('%Y-%m-%d') }}</small></h5>
+              <p>{{ reply.content }}</p>
+              {% if reply.author == current_user %}
+              <button type="button" class="btn btn-secondary btn-sm mt-1 mb-1" onclick="toggleEditForm({{ reply.id }})">Edit</button>
+              <form action="{{ url_for('delete_comment', comment_id=reply.id) }}" method="POST" style="display:inline;">
+                <input type="submit" type="button" class="btn btn-danger btn-sm m-1" value="Delete">
+              </form>
+              <!-- Edit Form -->
+              <form id="edit-form-{{ reply.id }}" action="{{ url_for('update_comment', comment_id=reply.id) }}" method="POST" style="display:none;">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                  {{ form.content.label(class="form-control-label") }}
+                  {{ form.content(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important", value=reply.content) }}
+                </div>
+                <div class="form-group">
+                  {{ form.submit(class="btn btn-primary btn-sm", value="Edit Comment") }}
+                </div>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
   </div>
 </article>
+
+<script>
+function toggleEditForm(commentId) {
+    var form = document.getElementById('edit-form-' + commentId);
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>
+
 <!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Delete Transaction?</h5>
+        <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
