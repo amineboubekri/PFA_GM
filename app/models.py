@@ -18,6 +18,12 @@ class User(db.Model, UserMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     transactions = db.relationship('Transaction', backref='owner', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy=True)
+    likes = db.relationship('Like', backref='user', lazy='dynamic')
+    def has_liked_post(self, post):
+        return Like.query.filter(
+            Like.user_id == self.id,
+            Like.post_id == post.id).count() > 0
+
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}', '{self.balance}')"
@@ -30,6 +36,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comments = db.relationship('Comment', backref='post', lazy=True, cascade="all, delete-orphan")
+    likes = db.relationship('Like', backref='post', lazy='dynamic', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -66,3 +73,8 @@ class Comment(db.Model):
     def __repr__(self):
         return f"Comment('{self.content}', '{self.date_posted}')"
 
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date_liked = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)

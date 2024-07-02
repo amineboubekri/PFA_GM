@@ -15,6 +15,18 @@
     </div>
     <h2 class="article-title">{{ post.title }}</h2>
     <p class="article-content">{{ post.content }}</p>
+    <div class="like-section">
+      <form action="{% if current_user.has_liked_post(post) %}{{ url_for('unlike_post', post_id=post.id) }}{% else %}{{ url_for('like_post', post_id=post.id) }}{% endif %}" method="POST">
+        <button type="submit" class="btn btn-primary">
+          {% if current_user.has_liked_post(post) %}
+            Unlike
+          {% else %}
+            Like
+          {% endif %}
+        </button>
+      </form>
+      <p>{{ post.likes.count() }} Likes</p>
+    </div>
     <div class="comments-section">
       <h3>Comments</h3>
       <form action="{{ url_for('post', post_id=post.id) }}" method="POST">

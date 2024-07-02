@@ -2,7 +2,7 @@ import os
 import secrets
 from datetime import datetime
 from PIL import Image 
-from app.models import User, Post, Transaction, Categorie, Comment
+from app.models import User, Post, Transaction, Categorie, Comment, Like
 from flask import render_template, url_for, flash, redirect, request, abort
 from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, TransactionForm, CategoryForm, UpdateBalanceForm, CommentForm, UpdateCommentForm
 from app import app, db, bcrypt
@@ -340,6 +340,27 @@ def delete_comment(comment_id):
     db.session.commit()
     flash('Your comment has been deleted!', 'success')
     return redirect(url_for('post', post_id=post_id))
+
+
+@app.route("/like_post/<int:post_id>", methods=['POST'])
+@login_required
+def like_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if not current_user.has_liked_post(post):
+        like = Like(user_id=current_user.id, post_id=post.id)
+        db.session.add(like)
+        db.session.commit()
+    return redirect(url_for('post', post_id=post.id))
+
+@app.route("/unlike_post/<int:post_id>", methods=['POST'])
+@login_required
+def unlike_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    like = Like.query.filter_by(user_id=current_user.id, post_id=post.id).first()
+    if like:
+        db.session.delete(like)
+        db.session.commit()
+    return redirect(url_for('post', post_id=post.id))
 # @app.route("/login1",methods=['GET', 'POST'])
 # def login2():
 #     form ="hi"
