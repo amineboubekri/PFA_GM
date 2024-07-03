@@ -99,7 +99,8 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("This email is already taken, choose another one")
 
 class UpdateBalanceForm(FlaskForm):
-    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0)], places=2)
+    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0.01, message='Amount must be greater than 0')])
+    operation = SelectField('Operation', choices=[('add', 'Ajouter'), ('reduce', 'Reduir')], validators=[DataRequired()])
     submit = SubmitField('Update Balance')
 
 class CommentForm(FlaskForm):

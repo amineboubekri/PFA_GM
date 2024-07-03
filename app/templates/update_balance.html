@@ -4,15 +4,14 @@
     <div class="media-body">
         <h1>Update Balance</h1>
         <form method="POST" action="">
-            <select style="border-color: rgba(0,0,0.4);color:black !important" name="year" class="form-control mr-2">
-                  <option style="border-color: rgba(0,0,0.4);color:black !important" value="montant" {% if year == selected_year %}selected{% endif %}> Ajouter</option>
-                  <option style="border-color: rgba(0,0,0.4);color:black !important" value="montant" {% if year == selected_year %}selected{% endif %}> Reduir</option>
-              </select>
             {{ form.hidden_tag() }}
             <div class="form-group">
+                {{ form.operation.label(class="form-control-label", style="color:black;") }}
+                {{ form.operation(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important") }}
+            </div>
+            <div class="form-group">
                 {{ form.amount.label(class="form-control-label", style="color:black;") }}
-                {{ form.amount(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black
-                !important") }}
+                {{ form.amount(class="form-control form-control-lg", style="border-color: rgba(0,0,0.4);color:black !important") }}
             </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
@@ -20,5 +19,4 @@
         </form>
     </div>
 </article>
-
 {% endblock content %}

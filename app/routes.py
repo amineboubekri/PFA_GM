@@ -3,11 +3,13 @@ import secrets
 from datetime import datetime
 from PIL import Image 
 from app.models import User, Post, Transaction, Categorie, Comment, Like
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, abort, send_file
 from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, TransactionForm, CategoryForm, UpdateBalanceForm, CommentForm, UpdateCommentForm
 from app import app, db, bcrypt
 from sqlalchemy import extract
 from flask_login import login_user, current_user, logout_user, login_required
+from io import BytesIO
+import csv
 
 
 
@@ -310,11 +312,20 @@ def update_transaction(transaction_id):
 def update_balance():
     form = UpdateBalanceForm()
     if form.validate_on_submit():
-        current_user.balance += float(form.amount.data)
+        amount = float(form.amount.data)
+        if form.operation.data == 'add':
+            current_user.balance += amount
+            flash('Your balance has been updated.', 'success')
+        elif form.operation.data == 'reduce':
+            if float(form.amount.data) > current_user.balance:
+                flash('Montant superieur a votre balance.', 'danger')
+            else:
+                current_user.balance -= amount
+                flash('Your balance has been updated.', 'success')
         db.session.commit()
-        flash('Your balance has been updated.', 'success')
         return redirect(url_for('account'))
     return render_template('update_balance.html', title='Update Balance', form=form, nav="yes")
+
 
 @app.route("/comment/<int:comment_id>/update", methods=['POST'])
 @login_required
@@ -361,6 +372,40 @@ def unlike_post(post_id):
         db.session.delete(like)
         db.session.commit()
     return redirect(url_for('post', post_id=post.id))
+
+
+#@app.route("/export_statistics")
+#@login_required
+#def export_statistics():
+#    si = BytesIO()
+#    writer = csv.writer(si)
+#    
+#    writer.writerow(["Title", "Amount", "Date", "Description", "Category"])
+#
+ #   for transaction in current_user.transactions:
+  #      writer.writerow([
+   #         transaction.title,
+    #        transaction.montant,
+     #       transaction.date.strftime('%Y-%m-%d %H:%M:%S'),
+      #      transaction.description,
+       #     transaction.categorie.nom
+        #])
+    
+    # Move the cursor of the StringIO object to the beginning
+    #si.seek(0)
+    
+    #return send_file(
+     #   si,
+      #  mimetype='text/csv',
+       # as_attachment=True,
+        #download_name='statistics.csv'
+    #)
+
+    # Move to the beginning of the BytesIO object
+    #output.seek(0)
+
+    # Send the CSV file
+    #return send_file(output, mimetype='text/csv', as_attachment=True, download_name='statistics.csv')
 # @app.route("/login1",methods=['GET', 'POST'])
 # def login2():
 #     form ="hi"
