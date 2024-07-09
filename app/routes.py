@@ -39,7 +39,7 @@ def register():
         db.session.commit()
         flash(f'Your account has been created! You can Log In now', 'success')
         return redirect(url_for('login'))
-    return render_template('register2.html', title='Register', form=form)
+    return render_template('register2.html', title='Register', form=form, logo='true')
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -55,7 +55,7 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('login2.html', title='Login',nav='no', form=form)
+    return render_template('login2.html', title='Login',nav='no', form=form,logo='true')
 
 @app.route("/logout")
 def logout():

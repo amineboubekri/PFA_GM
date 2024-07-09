@@ -61,7 +61,7 @@
               <th scope="row">{{ loop.index }}</th>
               <td>{{ transaction.title }}</td>
               <td>{{ transaction.montant }} MAD</td>
-              <td>{{ transaction.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+              <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
               <td>{{ transaction.description }}</td>
               <td>{{ transaction.categorie.nom }}</td>
               <td style="display: flex; justify-content: space-evenly;">

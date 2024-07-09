@@ -23,8 +23,17 @@
   <title>Money Manager</title>
   {% endif %}
 </head>
-
+{% if logo %}
+  <body
+  class="js-fullheight"
+  style="background-image: url({{ url_for('static', filename='img/logo.jpg') }});
+    background-size: cover; 
+  background-repeat: no-repeat;
+  background-attachment: fixed;"
+    >
+{% else %}
 <body class="js-fullheight" style="background-color:#343a40;">
+  {% endif %}
   {% if nav=='yes' %}
   <header class="site-header">
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
@@ -32,7 +41,6 @@
 
         <a class="" style="color: black;max-width: 15vw;" href="/">
           <img src="{{ url_for('static', filename='img/logo-removebg-Black.png') }}" alt="logo" style="width: 33%;">
-
           Money Manager</a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
