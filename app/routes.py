@@ -103,7 +103,7 @@ def account():
         extract('month', Transaction.date) == selected_month
     ).all()
 
-    # calculer spending per category
+    # Calculate spending per category
     category_spending = db.session.query(
         Categorie.nom, db.func.sum(Transaction.montant)
     ).join(Transaction).filter(
@@ -112,7 +112,7 @@ def account():
         extract('month', Transaction.date) == selected_month
     ).group_by(Categorie.nom).all()
 
-    # variables de chart
+    # Variables for chart
     categories = [category for category, _ in category_spending]
     amounts = [amount for _, amount in category_spending]
 

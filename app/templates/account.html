@@ -27,6 +27,15 @@
       <div class="account-details">
         <h3>&MediumSpace; Total des transactions : {{ current_user.total_transactions }} MAD</h3>
         <h3>&MediumSpace; Balance: {{ current_user.balance }} MAD</h3>
+        <h4>&MediumSpace; Statistiques</h4>
+        <div class="row">
+          <div class="col-md-6 col-sm-12">
+            <canvas id="spendingBarChart" width="400" height="200"></canvas>
+          </div>
+          <div class="col-md-6 col-sm-12">
+            <canvas id="spendingPieChart" width="400" height="200"></canvas>
+          </div>
+        </div>
         <h4>&MediumSpace; Historique de transactions</h4>
         
         <form method="GET" action="{{ url_for('account') }}" class="form-inline mb-3">
@@ -86,24 +95,29 @@
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   <hr style="border: 1px #dddddd solid;">
-  <h4>&MediumSpace; Statistiques</h4>
-  <canvas id="spendingChart" width="400" height="200"></canvas>
+ 
+  
+
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const ctx = document.getElementById('spendingChart').getContext('2d');
-    const spendingChart = new Chart(ctx, {
+    const barCtx = document.getElementById('spendingBarChart').getContext('2d');
+    const pieCtx = document.getElementById('spendingPieChart').getContext('2d');
+
+    const spendingData = {
+        labels: {{ categories | tojson }},
+        datasets: [{
+            label: 'Total',
+            data: {{ amounts | tojson }},
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const spendingBarChart = new Chart(barCtx, {
         type: 'bar',
-        data: {
-            labels: {{ categories | tojson }},
-            datasets: [{
-                label: 'Amount Spent',
-                data: {{ amounts | tojson }},
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
+        data: spendingData,
         options: {
             scales: {
                 y: {
@@ -112,8 +126,40 @@
             }
         }
     });
+
+    const spendingPieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ categories | tojson }},
+            datasets: [{
+                data: {{ amounts | tojson }},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
   </script>
 </div>
+
 <script>
   function deleteTransaction(event, transactionId, transactionAmount) {
     event.preventDefault();
