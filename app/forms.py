@@ -57,18 +57,18 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("This email is already taken, choose another one")
 
 class PostForm(FlaskForm):
-    title = StringField('Title',validators=[DataRequired()])
-    content =  TextAreaField('Content', validators=[DataRequired()])
-    submit = SubmitField('Post')
+    title = StringField('Titre',validators=[DataRequired()])
+    content =  TextAreaField('Contenu', validators=[DataRequired()])
+    submit = SubmitField('Poster')
 
 class TransactionForm(FlaskForm):
     id = HiddenField('Transaction ID')
-    title = StringField('Title', validators=[DataRequired(), Length(min=2, max=100)])
-    montant = FloatField('Amount', validators=[DataRequired(), NumberRange(min=0)])
+    title = StringField('Titre', validators=[DataRequired(), Length(min=2, max=100)])
+    montant = FloatField('Montant', validators=[DataRequired(), NumberRange(min=0)])
     date = DateTimeField('Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()], default=datetime.utcnow)
     description = TextAreaField('Description', validators=[DataRequired(), Length(min=10)])
-    categorie = SelectField('Category', coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Submit')
+    categorie = SelectField('Categorie', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Confirmer')
 
     def __init__(self, *args, **kwargs):
         super(TransactionForm, self).__init__(*args, **kwargs)
@@ -99,17 +99,17 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("This email is already taken, choose another one")
 
 class UpdateBalanceForm(FlaskForm):
-    amount = DecimalField('Amount', validators=[DataRequired(), NumberRange(min=0.01, message='Amount must be greater than 0')])
+    amount = DecimalField('Montant', validators=[DataRequired(), NumberRange(min=0.01, message='Amount must be greater than 0')])
     operation = SelectField('Operation', choices=[('add', 'Ajouter'), ('reduce', 'Reduir')], validators=[DataRequired()])
-    submit = SubmitField('Update Balance')
+    submit = SubmitField('Modifier Balance')
 
 class CommentForm(FlaskForm):
     content = TextAreaField('Comment', validators=[DataRequired()])
     submit = SubmitField('Post Comment')
 
 class UpdateCommentForm(FlaskForm):
-    content = StringField('Content', validators=[DataRequired()])
-    submit = SubmitField('Update')
+    content = StringField('Contenu', validators=[DataRequired()])
+    submit = SubmitField('Modifier')
 
 class DeleteCommentForm(FlaskForm):
-    submit = SubmitField('Delete')
+    submit = SubmitField('Supprimer')

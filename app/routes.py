@@ -288,11 +288,20 @@ def update_transaction(transaction_id):
     form = TransactionForm()
     
     if form.validate_on_submit():
+        old_amount = transaction.montant
+        new_amount = form.montant.data
+        amount_diff = new_amount - old_amount
+        
+        # Update the transaction
         transaction.title = form.title.data
-        transaction.montant = form.montant.data
+        transaction.montant = new_amount
         transaction.date = form.date.data
         transaction.description = form.description.data
         transaction.cat_id = form.categorie.data
+
+        current_user.balance -= amount_diff
+        current_user.total_transactions += amount_diff 
+
         db.session.commit()
         flash('Your transaction has been updated!', 'success')
         return redirect(url_for('account'))
@@ -306,6 +315,7 @@ def update_transaction(transaction_id):
         form.categorie.data = transaction.cat_id
     
     return render_template('transaction.html', title='Update Transaction', form=form, nav="yes")
+
 
 @app.route("/update_balance", methods=['GET', 'POST'])
 @login_required

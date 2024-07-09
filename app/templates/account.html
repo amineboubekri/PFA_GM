@@ -17,7 +17,7 @@
         <p>Email : {{ current_user.email }}</p>
       </div>
       <div>
-        <a class="btn btn-primary mr-3 mt-5" href="{{ url_for('update_account') }}">Update Account</a>
+        <a class="btn btn-primary mr-3 mt-5" href="{{ url_for('update_account') }}">Modifier compte</a>
       </div>
     </div>
   </div>
@@ -49,18 +49,18 @@
               <option style="border-color: rgba(0,0,0.4);color:black !important" value="{{ month }}" {% if month == selected_month %}selected{% endif %}> {{ month }} </option>
             {% endfor %}
           </select>
-          <button type="submit" class="btn btn-primary">Filter</button>
+          <button type="submit" class="btn btn-primary">Filtrer</button>
         </form>
 
         <table class="table table-hover">
           <thead class="thead-dark">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Title</th>
-              <th scope="col">Amount</th>
+              <th scope="col">Titre</th>
+              <th scope="col">Montant</th>
               <th scope="col">Date</th>
               <th scope="col">Description</th>
-              <th scope="col">Category</th>
+              <th scope="col">Categorie</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -75,11 +75,11 @@
               <td>{{ transaction.categorie.nom }}</td>
               <td style="display: flex; justify-content: space-evenly;">
                 <a href="{{ url_for('update_transaction', transaction_id=transaction.id) }}"
-                  class="btn btn-warning btn-sm">Edit</a>
+                  class="btn btn-warning btn-sm">Modifier</a>
                 <form method="POST" action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}"
                   onsubmit="return deleteTransaction(event, {{ transaction.id }}, {{ transaction.montant }});">
                   {{ form.hidden_tag() }}
-                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
                 </form>
               </td>
             </tr>

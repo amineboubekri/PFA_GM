@@ -2,7 +2,7 @@
     {% block content %}
     <br>
         <h1 align="center" style="color: goldenrod;">Home Page</h1>
-        <h1 class="mb-3" style="color: white;" >Posts by {{  user.username}} ({{ posts.total }}) </h1>
+        <h1 class="mb-3" style="color: white;" >Posts de {{  user.username}} ({{ posts.total }}) </h1>
         {% for post in posts.items %}
         <br>
             <article class="media content-section">
