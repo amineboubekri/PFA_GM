@@ -154,7 +154,11 @@ def new_post():
 
 @app.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
-    post = Post.query.get_or_404(post_id)
+    post = Post.query.get(post_id)
+    if post is None:
+        flash('Post inexistant.', 'danger')
+        return redirect(url_for('home'))
+        
     form = CommentForm()
     reply_form = CommentForm()
 
@@ -167,6 +171,7 @@ def post(post_id):
 
     comments = Comment.query.filter_by(post_id=post.id, parent_id=None).all()
     return render_template('post.html', title=post.title, post=post, form=form, comments=comments, reply_form=reply_form, nav="yes")
+
 
 @app.route("/comment/<int:comment_id>/reply", methods=['POST'])
 @login_required

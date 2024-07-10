@@ -1,5 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash-message" style="color: #dddddd;">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 <article class="media content-section">
   <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
   <div class="media-body">
