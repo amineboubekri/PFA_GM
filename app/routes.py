@@ -37,7 +37,7 @@ def register():
         user = User(username=form.username.data, email=form.email.data, password=hashed_pwd)
         db.session.add(user)
         db.session.commit()
-        flash(f'Your account has been created! You can Log In now', 'success')
+        flash(f'Votre compte a été créé ! Vous pouvez vous connecter maintenant', 'success')
         return redirect(url_for('login'))
     return render_template('register2.html', title='Register', form=form, logo='true')
 
@@ -54,7 +54,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Connexion échouée. Veuillez vérifier votre email et mot de passe', 'danger')
     return render_template('login2.html', title='Login',nav='no', form=form,logo='true')
 
 @app.route("/logout")
@@ -86,7 +86,7 @@ def account():
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
-        flash('Your account has been updated!', 'success')
+        flash('Votre compte est a jour', 'success')
         return redirect(url_for('account'))
 
     elif request.method == 'GET':
@@ -131,7 +131,7 @@ def update_account():
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
-        flash('Your account has been updated!', 'success')
+        flash('Votre compte est a jour!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
         form.username.data = current_user.username
@@ -147,7 +147,7 @@ def new_post():
         post = Post(title = form.title.data, content = form.content.data, author=current_user)
         db.session.add(post)
         db.session.commit()
-        flash('Your post has been created ', 'success')
+        flash('Votre publication est cree! ', 'success')
         return redirect(url_for('home'))    
     return render_template('create_post.html',nav="yes", title='New Post', form=form, legend="New Post")
 
@@ -166,7 +166,7 @@ def post(post_id):
         comment = Comment(content=form.content.data, author=current_user, post=post)
         db.session.add(comment)
         db.session.commit()
-        flash('Your comment has been posted.', 'success')
+        flash('Votre commentaire est publie', 'success')
         return redirect(url_for('post', post_id=post.id))
 
     comments = Comment.query.filter_by(post_id=post.id, parent_id=None).all()
@@ -184,7 +184,7 @@ def reply_comment(comment_id):
         reply = Comment(content=form.content.data, author=current_user, post=post, parent=comment)
         db.session.add(reply)
         db.session.commit()
-        flash('Your reply has been posted.', 'success')
+        flash('Votre reponse est publiee', 'success')
         return redirect(url_for('post', post_id=post.id))
 
     comments = Comment.query.filter_by(post_id=post.id, parent_id=None).all()
@@ -203,7 +203,7 @@ def update_post(post_id):
         post.title = form.title.data
         post.content = form.content.data
         db.session.commit()
-        flash('The post has been updated!', 'success')
+        flash('Votre post est a jour!', 'success')
         return redirect(url_for("post", post_id=post.id))
     elif request.method == "GET":
         form.title.data = post.title
@@ -218,7 +218,7 @@ def delete_post(post_id):
         abort(403)
     db.session.delete(post)
     db.session.commit()
-    flash('Your post has been deleted!', 'success')
+    flash('Votre post est supprime!', 'success')
     return redirect(url_for('home'))
 
 
@@ -239,7 +239,7 @@ def new_transaction():
     form.categorie.choices = [(c.id_cat, c.nom) for c in Categorie.query.all()]
     if form.validate_on_submit():
         if float(form.montant.data) > current_user.balance:
-            flash('Insufficient balance for this transaction.', 'danger')
+            flash('Insuffisant balance pour cette transaction.', 'danger')
         else:
             transaction = Transaction(
                 title=form.title.data,
@@ -253,7 +253,7 @@ def new_transaction():
             current_user.balance -= float(form.montant.data)
             current_user.total_transactions += float(form.montant.data)
             db.session.commit()
-            flash('Transaction successful.', 'success')
+            flash('Transaction avec succes', 'success')
             return redirect(url_for('account'))
     return render_template('transaction.html', title='New Transaction', form=form, nav="yes")
 
@@ -265,7 +265,7 @@ def categories():
         category = Categorie(nom=form.name.data)
         db.session.add(category)
         db.session.commit()
-        flash('New category has been created!', 'success')
+        flash('Nouvelle categorie!', 'success')
         return redirect(url_for('categories'))
     categories = Categorie.query.all()
     return render_template('categories.html', title='Categories', form=form, categories=categories, nav="yes")
@@ -280,7 +280,7 @@ def delete_transaction(transaction_id):
     current_user.total_transactions -= transaction.montant
     db.session.delete(transaction)
     db.session.commit()
-    flash('Your transaction has been deleted!', 'success')
+    flash('Votre transaction est supprimee', 'success')
     return redirect(url_for('account'))
 
 @app.route("/transaction/<int:transaction_id>/update", methods=['GET', 'POST'])
@@ -308,7 +308,7 @@ def update_transaction(transaction_id):
         current_user.total_transactions += amount_diff 
 
         db.session.commit()
-        flash('Your transaction has been updated!', 'success')
+        flash('Votre transaction est a jour', 'success')
         return redirect(url_for('account'))
     
     elif request.method == 'GET':
@@ -330,13 +330,13 @@ def update_balance():
         amount = float(form.amount.data)
         if form.operation.data == 'add':
             current_user.balance += amount
-            flash('Your balance has been updated.', 'success')
+            flash('Votre balance est a jour', 'success')
         elif form.operation.data == 'reduce':
             if float(form.amount.data) > current_user.balance:
                 flash('Montant superieur a votre balance.', 'danger')
             else:
                 current_user.balance -= amount
-                flash('Your balance has been updated.', 'success')
+                flash('Votre balance est mis a jour', 'success')
         db.session.commit()
         return redirect(url_for('account'))
     return render_template('update_balance.html', title='Update Balance', form=form, nav="yes")
@@ -352,7 +352,7 @@ def update_comment(comment_id):
     if form.validate_on_submit():
         comment.content = form.content.data
         db.session.commit()
-        flash('Your comment has been updated.', 'success')
+        flash('Votre commentaire est mis a jour.', 'success')
     return redirect(url_for('post', post_id=comment.post_id))
 
 @app.route('/comment/<int:comment_id>/delete', methods=['POST'])
@@ -364,7 +364,7 @@ def delete_comment(comment_id):
         abort(403)
     db.session.delete(comment)
     db.session.commit()
-    flash('Your comment has been deleted!', 'success')
+    flash('Votre commentaire est supprime', 'success')
     return redirect(url_for('post', post_id=post_id))
 
 
@@ -400,7 +400,7 @@ def delete_category(category_id):
 
     db.session.delete(category)
     db.session.commit()
-    flash('Category has been deleted!', 'success')
+    flash('Categorie Supprimee', 'success')
     return redirect(url_for('categories'))
 
 
