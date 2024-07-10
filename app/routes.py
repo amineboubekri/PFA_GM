@@ -383,6 +383,21 @@ def unlike_post(post_id):
         db.session.commit()
     return redirect(url_for('post', post_id=post.id))
 
+@app.route('/category/<int:category_id>/delete', methods=['POST'])
+@login_required
+def delete_category(category_id):
+    category = Categorie.query.get_or_404(category_id)
+    
+    transactions = Transaction.query.filter_by(cat_id=category.id_cat).first()
+    if transactions:
+        flash('On peut pas supprimer cette categorie il y a des transactions.', 'danger')
+        return redirect(url_for('categories'))
+
+    db.session.delete(category)
+    db.session.commit()
+    flash('Category has been deleted!', 'success')
+    return redirect(url_for('categories'))
+
 
 #@app.route("/export_statistics")
 #@login_required
