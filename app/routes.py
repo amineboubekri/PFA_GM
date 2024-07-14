@@ -395,7 +395,7 @@ def delete_category(category_id):
     
     transactions = Transaction.query.filter_by(cat_id=category.id_cat).first()
     if transactions:
-        flash('On peut pas supprimer cette categorie il y a des transactions.', 'danger')
+        flash('On ne peut pas supprimer cette categorie car elle contient des transactions!.', 'danger')
         return redirect(url_for('categories'))
 
     db.session.delete(category)
