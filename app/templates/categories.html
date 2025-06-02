@@ -11,7 +11,7 @@
 <br>
 <article class="media content-section">
     <div class="media-body">
-        <h2 align="center" style="color:goldenrod;">Ajouter categorie</h2>
+        <h2 align="center" style="color:goldenrod;">Ajouter catégorie</h2>
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <div class="form-group">
@@ -23,14 +23,14 @@
             </div>
         </form>
         <div align="center">
-            <h2 style="color: goldenrod;">Categories existantes</h2>
+            <h2 style="color: goldenrod;">Catégories existantes</h2>
             <ul>
                 {% for category in categories %}
                 <li style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 style="color: black;">{{ category.nom }}</h3>
                     <form method="POST" action="{{ url_for('delete_category', category_id=category.id_cat) }}" style="display:inline;">
                         {{ form.hidden_tag() }}
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
                     </form>
                 </li>
                 {% endfor %}
